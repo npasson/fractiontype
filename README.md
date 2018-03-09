@@ -38,14 +38,32 @@ int main() {
 This type will be the base I build my future math projects on, since Matrix inversions involve a lot of divisions and multiplication and floating point has too many precision errors.
 
 ## Usage
+**1\.**
+ `cd` into your project folder, and run
+```
+git clone https://gitlab.tubit.tu-berlin.de/npasson/fractiontype.git
+```
+This will download the code.
 
+**2\.**
+Run 
+```
+g++ -c -std=c++11 ./Fraction/include/fraction.cpp -o libfraction.o
+```
+This will add a compiled object file into your project folder. You need to repeat this step every time you make changes to the Fraction code.
+
+**3\.**
 Add these two lines at the top of your program:
-
 ```
 #include "Fraction/include/fraction.hpp"
 using npasson::Fraction;
 ```
 In case you're using two fraction implementations, you can leave out the second line and access the type via the `npasson` namespace (just replace the affected `Fraction`s by `npasson::Fraction`).
+
+**4\.**
+From now on, you can compile like normal (and use the Fraction type), but add `-lfraction` to the linker arguments. This means *after* the file names:
+
+`g++ -std=c++14 foo.cpp main.cpp`**`-lfraction`**`-o bar`
 
 ## Reference
 
@@ -53,7 +71,7 @@ Positive range:
 from `0.00000000000000000010842022`
 to `9223372036854775807`
 
-For a documentation of public functions see <http://www.npasson.com/fractiontype>.
+For a documentation see <http://www.npasson.com/fractiontype>.
 
 ## License
 
