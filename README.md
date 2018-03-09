@@ -40,7 +40,7 @@ This type will be the base I build my future math projects on, since Matrix inve
 **1\.**
  `cd` into your project folder, and run
 ```
-git clone https://gitlab.tubit.tu-berlin.de/npasson/fractiontype.git
+git clone https://github.com/npasson/fractiontype.git
 ```
 This will download the code.
 
