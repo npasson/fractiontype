@@ -1,4 +1,3 @@
-
 ## Fraction Type
 
 A simple fraction-like type for C++11 and up. Preserves precision in all operations.
@@ -9,7 +8,7 @@ The Fraction type can be seamlessly used instead of normal numeric types:
 
 ```
 #include <cstdio>
-#include "Fraction/include/fraction.hpp"
+#include "fractiontype/include/fraction.hpp"
 using npasson::Fraction;
 
 Fraction f(Fraction x) {
@@ -48,14 +47,14 @@ This will download the code.
 **2\.**
 Run 
 ```
-g++ -c -std=c++11 ./Fraction/include/fraction.cpp -o libfraction.o
+g++ -c -std=c++11 ./fractiontype/include/fraction.cpp -o libfraction.o
 ```
 This will add a compiled object file into your project folder. You need to repeat this step every time you make changes to the Fraction code.
 
 **3\.**
 Add these two lines at the top of your program:
 ```
-#include "Fraction/include/fraction.hpp"
+#include "fractiontype/include/fraction.hpp"
 using npasson::Fraction;
 ```
 In case you're using two fraction implementations, you can leave out the second line and access the type via the `npasson` namespace (just replace the affected `Fraction`s by `npasson::Fraction`).
