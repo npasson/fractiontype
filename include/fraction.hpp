@@ -27,6 +27,7 @@
 #ifndef NPASSON_FRACTION_HPP
 #define NPASSON_FRACTION_HPP
 
+#include <string>
 #include <typeinfo>
 
 #ifdef NPASSON_DEBUG
