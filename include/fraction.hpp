@@ -109,6 +109,7 @@ namespace npasson {
 
 		template<typename T>
 		Fraction& operator+=(const T &rhs) {
+            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator += (Fraction, [type])");
 			if (typeid(T) == typeid(long long int)
 				|| typeid(T) == typeid(long int)
 				|| typeid(T) == typeid(int)
@@ -130,6 +131,7 @@ namespace npasson {
 
 		template<typename T>
 		Fraction  operator+(const T &rhs) const {
+            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator + (Fraction, [type])");
 			Fraction temp = (*this);
 			return temp += rhs;
 		}
@@ -140,6 +142,7 @@ namespace npasson {
 
 		template<typename T>
 		Fraction& operator-=(const T &rhs) {
+            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator -= (Fraction, [type])");
 			if (typeid(T) == typeid(long long int)
 				|| typeid(T) == typeid(long int)
 				|| typeid(T) == typeid(int)
@@ -161,6 +164,7 @@ namespace npasson {
 
 		template<typename T>
 		Fraction  operator-(const T &rhs) const {
+            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator - (Fraction, [type])");
 			Fraction temp = (*this);
 			return temp -= rhs;
 		}
@@ -171,6 +175,7 @@ namespace npasson {
 
 		template<typename T>
 		Fraction& operator*=(const T &rhs) {
+            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator *= (Fraction, [type])");
 			if (typeid(T) == typeid(long long int)
 				|| typeid(T) == typeid(long int)
 				|| typeid(T) == typeid(int)
@@ -191,6 +196,7 @@ namespace npasson {
 
 		template<typename T>
 		Fraction  operator*(const T &rhs) const {
+            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator * (Fraction, [type])");
 			Fraction temp = (*this);
 			return temp *= rhs;
 		}
@@ -201,6 +207,7 @@ namespace npasson {
 
 		template<typename T>
 		Fraction& operator/=(const T &rhs) {
+            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator /= (Fraction, [type])");
 			if (typeid(T) == typeid(long long int)
 				|| typeid(T) == typeid(long int)
 				|| typeid(T) == typeid(int)
@@ -221,6 +228,7 @@ namespace npasson {
 
 		template<typename T>
 		Fraction  operator/(const T &rhs) const {
+            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator / (Fraction, [type])");
 			Fraction temp = (*this);
 			return temp /= rhs;
 		}
