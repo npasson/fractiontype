@@ -12,18 +12,18 @@ The Fraction type can be seamlessly used instead of normal numeric types:
 using npasson::Fraction;
 
 Fraction f(Fraction x) {
-    return 1/x;
+	return 1/x;
 }
 
 int main() {
 
 	// initialize like you're used to
-    Fraction a = 15;
-    Fraction b = 0.2;
+	Fraction a = 15;
+	Fraction b = 0.2;
 
 	// multiplication and divsion operators implemented
-    Fraction c = f(a)*f(b); // (1/15)*(1/0.2) == 1/3
-    Fraction d = f(c)/2;	// f(1/3)/2 == 1.5
+	Fraction c = f(a)*f(b); // (1/15)*(1/0.2) == 1/3
+	Fraction d = f(c)/2;	// f(1/3)/2 == 1.5
 
 	// casting to needed types
 	printf("d is %f", (double)d);	// prints "d is 1.5"
