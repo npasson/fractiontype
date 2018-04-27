@@ -63,6 +63,10 @@ namespace npasson {
 				   || std::is_same<T, long int>::value
 				   || std::is_same<T, int>::value
 				   || std::is_same<T, short>::value
+				   || std::is_same<T, unsigned long long int>::value
+				   || std::is_same<T, unsigned long int>::value
+				   || std::is_same<T, unsigned int>::value
+				   || std::is_same<T, unsigned short>::value
 				   || std::is_same<T, float>::value
 				   || std::is_same<T, double>::value;
 		}
