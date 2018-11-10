@@ -24,7 +24,8 @@
  * The code of the Fraction class.
  */
 
-#include <regex>
+#include <sstream>
+
 #ifndef NPASSON_EXPERIMENTAL_COMPILE
 #include "fraction.hpp"
 #endif
@@ -39,23 +40,58 @@
 namespace npasson {
 
 	/**
-	 * A regex to recognize number formats. Will be removed in the future. Don't rely on it.
-	 * @deprecated since 0.1
+	 * Tests if given char is a numeric digit. Compares it against the ASCII table digits.
+	 *
+	 * @param c
+	 * @return true if <tt>c</tt> is a numeric digit
 	 */
-	const std::string Fraction::number_regex = "^-?\\d+((,|.)\\d+)?$"; // NOLINT
+	bool Fraction::isdigit(char c) {
+		return c >= 48 && c <= 57;
+	}
+
+	/**
+	 * Returns true if the character passed is a numeric delimiter, i.e. a dot or a comma.
+	 *
+	 * @param c
+	 * @return true if <tt>c</tt> is a delimiter
+	 */
+	bool Fraction::isdelim(char c) {
+		return c == '.' || c == ',';
+	}
 
 	/**
 	 * \brief Tests if the string is a number.
 	 *
-	 * Tests if the string can be processed as a number. This uses <tt>number_regex</tt>, which currently only matches
-	 * decimal numbers with a dot or a commas as decimal delimiter.
+	 * Tests if the string can be processed as a number. Currently only matches
+	 * decimal numbers with a dot or a commas as decimal delimiter. Runs in O(n).
 	 *
 	 * @param str A string representing a number (or not).
 	 * @retval <b><tt>true</tt></b> when the string represents a decimal number
 	 * @retval <b><tt>false</tt></b> otherwise
 	 */
 	bool Fraction::isnumber(std::string str) {
-		return std::regex_match(str,std::regex(number_regex));
+		if(str.empty()) return false;
+
+		if(str[0] == '-') {
+			str = str.substr(1); // remove the minus from the front
+		} else if (!isdigit(str[0])) {
+			return false; // if first char is no digit
+		} else if (isdelim(str[str.size() - 1])) {
+			return false; // if last char is a delimiter
+		}
+
+		int i;
+		int d = 0;
+		char c = str[0];
+		for(i = 0;
+			i<str.size() // while not at the end of the string
+			&& (d += (isdelim(c)) ? 1 : 0) < 2 // and we haven't had more than one delimiter yet
+			&& (isdigit(c) || isdelim(c)); // and everything's still a digit or delimiter,
+			c = (i+1 == str.size()) ? (char)++i : str[++i]) // set c to the next character if still in string
+															// (else increase i anyway)
+		{}
+
+		return i == str.size(); // if we went through once without breaking rules, it's a number.
 	}
 
 	/**

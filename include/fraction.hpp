@@ -46,10 +46,11 @@ namespace npasson {
 	private:
 		long long signed int numerator = 0;
 		long long signed int denominator = 1;
-		const static std::string number_regex;
 		bool _invalid = false;
 		static long long signed int gcd(long long signed int, long long signed int);
 		static long long signed int lcm(long long signed int, long long signed int);
+		static bool isdigit(char);
+		static bool isdelim(char);
 		static bool isnumber(std::string);
 	public:
 		/**
