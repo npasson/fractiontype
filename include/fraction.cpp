@@ -27,10 +27,17 @@
 #include <sstream>
 
 #ifndef NPASSON_EXPERIMENTAL_COMPILE
-#include "fraction.hpp"
+	#include "fraction.hpp"
 #endif
+
 #ifdef NPASSON_DEBUG
-#	include <iostream>
+	#include <iostream>
+#endif
+
+#if defined(__GNUC__) || defined(__MINGW32__) || defined(__clang__)
+	#define NPASSON_MAYBE_UNUSED __attribute__((unused))
+#else
+	#define NPASSON_MAYBE_UNUSED
 #endif
 
 // yeah yeah, implementation-defined, but really, there's no reason
@@ -45,7 +52,7 @@ namespace npasson {
 	 * @param c
 	 * @return true if <tt>c</tt> is a numeric digit
 	 */
-	bool Fraction::isdigit(char c) {
+	constexpr bool Fraction::isdigit(char c) {
 		return c >= 48 && c <= 57;
 	}
 
@@ -55,7 +62,7 @@ namespace npasson {
 	 * @param c
 	 * @return true if <tt>c</tt> is a delimiter
 	 */
-	bool Fraction::isdelim(char c) {
+	constexpr bool Fraction::isdelim(char c) {
 		return c == '.' || c == ',';
 	}
 
@@ -88,21 +95,21 @@ namespace npasson {
 			&& (d += (isdelim(c)) ? 1 : 0) < 2 // and we haven't had more than one delimiter yet
 			&& (isdigit(c) || isdelim(c)); // and everything's still a digit or delimiter,
 			c = (i+1 == str.size()) ? (char)++i : str[++i]) // set c to the next character if still in string
-															// (else increase i anyway)
+			                                                // (else increase i anyway)
 		{}
 
 		return i == str.size(); // if we went through once without breaking rules, it's a number.
 	}
 
 	/**
-	 * This constructor initializes the Fraction to be 0/1.
+	 * This constructor initializes the Fraction to be 0/1 (= 0)
 	 */
 	Fraction::Fraction() {
 		this->numerator = 0;
 		this->denominator = 1;
 	}
 
-	Fraction::Fraction(const Fraction &frac) = default;
+	Fraction::Fraction(const Fraction&) = default;
 
 	Fraction::Fraction(long long signed int numerator, long long signed int denominator) {
 		if (denominator == 0) {
@@ -159,7 +166,6 @@ namespace npasson {
 
 	Fraction::Fraction(std::string str_val) {
 		if(!isnumber(str_val)) {
-			//std::cerr << "Passed string () is not a number. Fraction initialized to zero." << std::endl;
 			this->numerator = 0;
 			this->denominator = 1;
 			this->_invalid = true;
@@ -171,8 +177,8 @@ namespace npasson {
 
 		// basically: if you're using a dot, find that, otherwise find a comma
 		unsigned int dec_pos = (str_val.find('.') != std::string::npos)?
-							   str_val.find('.'):
-							   str_val.find(',');
+		                        str_val.find('.'):
+		                        str_val.find(',');
 
 		// get the right hand side of the decimal point
 		std::string right_decimal_str = str_val.substr(dec_pos+1);
@@ -236,28 +242,51 @@ namespace npasson {
 
 	Fraction::~Fraction() = default; // nothing to destroy
 
-	bool Fraction::valid() const {
+	/**
+	 * Checks if the Fraction is still valid (no divisions by zero, constructor successfully ran, etc)
+	 *
+	 * @return <tt>true</tt> if the Fraction is still valid
+	 */
+	NPASSON_MAYBE_UNUSED bool Fraction::valid() const {
 		return !(this->_invalid);
 	}
 
 	/* === GENERIC RETURNS === */
 
-	Fraction::operator long long int()	const {return (			 numerator)/		  denominator;}
-	Fraction::operator long int()		const {return (long int)(((double)	 numerator)/(double)  denominator);}
-	Fraction::operator int()			const {return (int)(((double)	 numerator)/(double)  denominator);}
-	Fraction::operator short()			const {return (short)(((double)	 numerator)/(double)  denominator);}
-	Fraction::operator float()			const {return (float)(((double)	 numerator)/(double)  denominator);}
-	Fraction::operator double()			const {return ((double)	 numerator)/(double)  denominator;}
-	Fraction::operator bool() 			const {return (numerator != 0);}
+	Fraction::operator long long int()  const {return                     (numerator/           denominator);}
+	Fraction::operator long int()       const {return (long int)(((double) numerator)/(double)  denominator);}
+	Fraction::operator int()            const {return (int)     (((double) numerator)/(double)  denominator);}
+	Fraction::operator short()          const {return (short)   (((double) numerator)/(double)  denominator);}
+	Fraction::operator float()          const {return (float)   (((double) numerator)/(double)  denominator);}
+	Fraction::operator double()         const {return            ((double) numerator)/(double)  denominator;}
+	Fraction::operator bool()           const {return                     (numerator != 0);}
+
 	/**
-	 * \brief Returns <tt>this</tt> as a <tt>std::string</tt>.
+	 * Returns a decimal representation of the Fraction as a <tt>std::string</tt>.
 	 *
-	 * @return A decimal std::string representation of the Fraction.
+	 * @return <tt>this</tt> as a <tt>std::string</tt>.
 	 */
-	std::string Fraction::str()			const {return std::to_string((double)(*this));}
-	const char* Fraction::c_str()		const {return (*this).str().c_str();}
-	std::string Fraction::f_str() 		const
-			{return (std::to_string((*this).numerator) + "/" + std::to_string((*this).denominator));}
+	std::string Fraction::str() const {
+		return std::to_string((double)(*this));
+	}
+
+	/**
+	 * Returns a decimal representation of the Fraction as a <tt>const char*</tt>.
+	 *
+	 * @return <tt>this</tt> as a <tt>const char*</tt>.
+	 */
+	NPASSON_MAYBE_UNUSED const char* Fraction::c_str() const {
+		return (*this).str().c_str();
+	}
+
+	/**
+	 * Returns a <b>fractional</b> representation of the Fraction as a <tt>std::string</tt>.
+	 *
+	 * @return <tt>this</tt> as a <tt>std::string</tt>.
+	 */
+	NPASSON_MAYBE_UNUSED std::string Fraction::f_str() const {
+		return (std::to_string((*this).numerator) + "/" + std::to_string((*this).denominator));
+	}
 
 	/* === OPERATORS === */
 
@@ -291,8 +320,8 @@ namespace npasson {
 	/* MULTIPLICATION */
 	Fraction& Fraction::operator*=(const Fraction &rhs) {
 		return ((*this) = Fraction(
-				numerator * rhs.numerator,
-				denominator * rhs.denominator
+			numerator * rhs.numerator,
+			denominator * rhs.denominator
 		));
 	}
 	Fraction  Fraction::operator* (const Fraction &rhs) const {
@@ -304,8 +333,8 @@ namespace npasson {
 	/* DIVISION */
 	Fraction& Fraction::operator/=(const Fraction &rhs) {
 		return ((*this) = Fraction(
-				numerator * rhs.denominator,
-				denominator * rhs.numerator
+			numerator * rhs.denominator,
+			denominator * rhs.numerator
 		));
 	}
 	Fraction  Fraction::operator/ (const Fraction &rhs) const {
@@ -315,22 +344,26 @@ namespace npasson {
 
 	/* MISC OPERATORS */
 
-	Fraction &Fraction::operator++()	{return ((*this) = Fraction(numerator + denominator, denominator));}
-	Fraction  Fraction::operator++(int) {Fraction temp = (*this); ++(*this); return temp;}
+	      Fraction &Fraction::operator++()    {return ((*this) = Fraction(numerator + denominator, denominator));}
+	const Fraction  Fraction::operator++(int) {const Fraction temp = (*this); ++(*this); return temp;}
 
-	Fraction &Fraction::operator--()	{return ((*this) = Fraction(numerator - denominator, denominator));}
-	Fraction  Fraction::operator--(int) {Fraction temp = (*this); --(*this); return temp;}
+	      Fraction &Fraction::operator--()    {return ((*this) = Fraction(numerator - denominator, denominator));}
+	const Fraction  Fraction::operator--(int) {const Fraction temp = (*this); --(*this); return temp;}
 
-	Fraction  Fraction::operator+ () const 	{return Fraction(*this);}
-	Fraction  Fraction::operator- () const	{return Fraction(-numerator, denominator);}
+	Fraction Fraction::operator+ () const   {return Fraction(*this);}
+	Fraction Fraction::operator- () const   {return Fraction(-numerator, denominator);}
 
-	std::ostream&       operator<<(std::ostream &os, const Fraction &frac) {os << (double)frac; return os;}
+	std::ostream&         operator<<(std::ostream &os, const Fraction &frac) {os << (double)frac; return os;}
 	std::string	Fraction::operator()(){return this->str();}
 
 	bool Fraction::operator==(const Fraction &rhs) const {
-		return (this->numerator == 0)? rhs.numerator == 0 :
-			   ((this->numerator/gcd(this->numerator,this->denominator) == rhs.numerator/gcd(rhs.numerator, rhs.denominator))
-			   && (this->denominator/gcd(this->numerator,this->denominator) == rhs.denominator/gcd(rhs.numerator, rhs.denominator)));
+		return ((this->numerator == 0)? rhs.numerator == 0 :
+			(
+			      (this->numerator/gcd(this->numerator, this->denominator)
+			    == rhs.  numerator/gcd(rhs.  numerator, rhs.  denominator))
+			&&    (this->denominator/gcd(this->numerator, this->denominator)
+			    == rhs.  denominator/gcd(rhs.  numerator, rhs.  denominator)))
+			);
 	}
 	bool Fraction::operator!=(const Fraction &rhs) const {
 		return !((*this) == rhs);
@@ -339,15 +372,15 @@ namespace npasson {
 	bool Fraction::operator< (const Fraction &rhs) const {
 		long long int multiple = lcm(denominator, rhs.denominator);
 		return (
-					(	 numerator)*(multiple/    denominator)
-				  < (rhs.numerator)*(multiple/rhs.denominator)
+			  (this->numerator)*(multiple/this->denominator)
+			< (rhs.  numerator)*(multiple/rhs.  denominator)
 		);
 	}
 	bool Fraction::operator> (const Fraction &rhs) const {
 		long long int multiple = lcm(denominator, rhs.denominator);
 		return (
-				(	   numerator)*(multiple/    denominator)
-				> (rhs.numerator)*(multiple/rhs.denominator)
+			  (this->numerator)*(multiple/this->denominator)
+			> (rhs.  numerator)*(multiple/rhs.  denominator)
 		);
 	}
 	bool Fraction::operator<=(const Fraction &rhs) const {return !((*this)>rhs);}
@@ -400,7 +433,7 @@ namespace npasson {
 	 * @param frac The Fraction to be inverted.
 	 * \sa invert()
 	 */
-	void Fraction::invert(Fraction &frac) {
+	NPASSON_MAYBE_UNUSED void Fraction::invert(Fraction &frac) {
 		// XOR swap algorithm
 		frac.numerator = (frac.numerator)^(frac.denominator);
 		frac.denominator = (frac.denominator)^(frac.numerator);
@@ -462,4 +495,5 @@ namespace npasson {
 
 }
 
+#undef NPASSON_MAYBE_UNUSED
 #undef MAX_VAL

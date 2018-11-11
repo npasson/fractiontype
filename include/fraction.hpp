@@ -27,6 +27,18 @@
 #ifndef NPASSON_FRACTION_HPP
 #define NPASSON_FRACTION_HPP
 
+#if __cplusplus > 201703L
+#define NPASSON_IF_CONSTEXPR if constexpr
+#else
+#define NPASSON_IF_CONSTEXPR if
+#endif
+
+#if defined(__GNUC__) || defined(__MINGW32__) || defined(__clang__)
+#define NPASSON_MAYBE_UNUSED __attribute__((unused))
+#else
+#define NPASSON_MAYBE_UNUSED
+#endif
+
 #include <string>
 #include <typeinfo>
 
@@ -39,53 +51,53 @@
 
 namespace npasson {
 
+	/**
+	 *  The Fraction type. Read more at npasson.com/fractiontype
+	 */
 	class Fraction {
-		/** \class Fraction fraction.hpp "Fraction/fraction.hpp"
-		 *  The Fraction type. Read more at npasson.com/fraction
-		 */
+
 	private:
-		long long signed int numerator = 0;
-		long long signed int denominator = 1;
-		bool _invalid = false;
-		static long long signed int gcd(long long signed int, long long signed int);
-		static long long signed int lcm(long long signed int, long long signed int);
-		static bool isdigit(char);
-		static bool isdelim(char);
-		static bool isnumber(std::string);
+		                 long long signed int numerator = 0;
+		                 long long signed int denominator = 1;
+		                 bool _invalid = false;
+		          static long long signed int gcd(long long signed int, long long signed int);
+		          static long long signed int lcm(long long signed int, long long signed int);
+		constexpr static bool isdigit(char);
+		constexpr static bool isdelim(char);
+		          static bool isnumber(std::string);
 	public:
 		/**
-		 *
 		 * @tparam T A numeric type which might be supported.
 		 * @return If <tt>T</tt> is supported by the Fraction class.
 		 */
 		template <typename T>
 		static constexpr bool is_supported_type() {
 			return std::is_same<T, long long int>::value
-				   || std::is_same<T, long int>::value
-				   || std::is_same<T, int>::value
-				   || std::is_same<T, short>::value
-				   || std::is_same<T, unsigned long long int>::value
-				   || std::is_same<T, unsigned long int>::value
-				   || std::is_same<T, unsigned int>::value
-				   || std::is_same<T, unsigned short>::value
-				   || std::is_same<T, float>::value
-				   || std::is_same<T, double>::value;
+			    || std::is_same<T, long int>::value
+			    || std::is_same<T, int>::value
+			    || std::is_same<T, short>::value
+			    || std::is_same<T, unsigned long long int>::value
+			    || std::is_same<T, unsigned long int>::value
+			    || std::is_same<T, unsigned int>::value
+			    || std::is_same<T, unsigned short>::value
+			    || std::is_same<T, float>::value
+			    || std::is_same<T, double>::value;
 		}
 
 		Fraction();
 		Fraction(const Fraction&);
 		Fraction(long long signed int, long long signed int);
 		explicit Fraction(unsigned long long int);
-				 Fraction(signed long long int);  // NOLINT
+		         Fraction(signed long long int); // NOLINT
 		explicit Fraction(unsigned long int);
 		explicit Fraction(signed long int);
 		explicit Fraction(unsigned int);
-				 Fraction(signed int); // NOLINT
+		         Fraction(signed int); // NOLINT
 		explicit Fraction(unsigned short);
 		explicit Fraction(signed short);
 		explicit Fraction(std::string);
 		explicit Fraction(float);
-				 Fraction(double); // NOLINT
+		         Fraction(double); // NOLINT
 		explicit Fraction(long double);
 		explicit Fraction(const char*);
 		explicit Fraction(char*);
@@ -93,7 +105,7 @@ namespace npasson {
 
 		~Fraction();
 
-		bool valid() const;
+		NPASSON_MAYBE_UNUSED bool valid() const;
 
 		explicit operator long long int() const;
 		explicit operator long int() const;
@@ -103,8 +115,8 @@ namespace npasson {
 		explicit operator double() const;
 		explicit operator bool () const;
 		std::string str() const;
-		const char* c_str() const;
-		std::string f_str() const;
+		NPASSON_MAYBE_UNUSED const char* c_str() const;
+		NPASSON_MAYBE_UNUSED std::string f_str() const;
 
 		/* ********************* OPERATOR OVERLOADINGS ******************** *
 		 * **************************************************************** */
@@ -115,16 +127,17 @@ namespace npasson {
 
 		template<typename T>
 		Fraction& operator+=(const T &rhs) {
-            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator += (Fraction, [type])");
-			if (typeid(T) == typeid(long long int)
-				|| typeid(T) == typeid(long int)
-				|| typeid(T) == typeid(int)
-				|| typeid(T) == typeid(short))
+			static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator += (Fraction, [type])");
+			NPASSON_IF_CONSTEXPR (typeid(T) == typeid(long long int)
+			                   || typeid(T) == typeid(long int)
+			                   || typeid(T) == typeid(int)
+			                   || typeid(T) == typeid(short))
 			{
 				return ((*this) = Fraction((numerator + rhs*denominator),denominator));
 			}
-			else if (typeid(T) == typeid(float)
-					 || typeid(T) == typeid(double)) {
+			else NPASSON_IF_CONSTEXPR (typeid(T) == typeid(float)
+			                        || typeid(T) == typeid(double))
+			{
 				Fraction rhsf(rhs);
 				long long int num, den;
 				num = (numerator*rhsf.denominator + rhsf.numerator*denominator);
@@ -137,7 +150,7 @@ namespace npasson {
 
 		template<typename T>
 		Fraction  operator+(const T &rhs) const {
-            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator + (Fraction, [type])");
+			static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator + (Fraction, [type])");
 			Fraction temp = (*this);
 			return temp += rhs;
 		}
@@ -148,16 +161,17 @@ namespace npasson {
 
 		template<typename T>
 		Fraction& operator-=(const T &rhs) {
-            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator -= (Fraction, [type])");
-			if (typeid(T) == typeid(long long int)
-				|| typeid(T) == typeid(long int)
-				|| typeid(T) == typeid(int)
-				|| typeid(T) == typeid(short))
+			static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator -= (Fraction, [type])");
+			NPASSON_IF_CONSTEXPR (typeid(T) == typeid(long long int)
+			                   || typeid(T) == typeid(long int)
+			                   || typeid(T) == typeid(int)
+			                   || typeid(T) == typeid(short))
 			{
 				return ((*this) = Fraction((numerator - rhs*denominator),denominator));
 			}
-			else if (typeid(T) == typeid(float)
-					 || typeid(T) == typeid(double)) {
+			else NPASSON_IF_CONSTEXPR (typeid(T) == typeid(float)
+			                        || typeid(T) == typeid(double))
+			{
 				Fraction rhsf(rhs);
 				long long int num, den;
 				num = (numerator*rhsf.denominator - rhsf.numerator*denominator);
@@ -169,8 +183,8 @@ namespace npasson {
 		}
 
 		template<typename T>
-		Fraction  operator-(const T &rhs) const {
-            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator - (Fraction, [type])");
+		Fraction operator-(const T &rhs) const {
+			static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator - (Fraction, [type])");
 			Fraction temp = (*this);
 			return temp -= rhs;
 		}
@@ -181,20 +195,21 @@ namespace npasson {
 
 		template<typename T>
 		Fraction& operator*=(const T &rhs) {
-            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator *= (Fraction, [type])");
-			if (typeid(T) == typeid(long long int)
-				|| typeid(T) == typeid(long int)
-				|| typeid(T) == typeid(int)
-				|| typeid(T) == typeid(short))
+			static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator *= (Fraction, [type])");
+			NPASSON_IF_CONSTEXPR (typeid(T) == typeid(long long int)
+			                   || typeid(T) == typeid(long int)
+			                   || typeid(T) == typeid(int)
+			                   || typeid(T) == typeid(short))
 			{
 				return ((*this) = Fraction(numerator * rhs, denominator));
 			}
-			else if (typeid(T) == typeid(float)
-					 || typeid(T) == typeid(double)) {
+			else NPASSON_IF_CONSTEXPR (typeid(T) == typeid(float)
+			                        || typeid(T) == typeid(double))
+			{
 				Fraction rhsf(rhs);
 				return ((*this) = Fraction(
-						numerator * rhsf.numerator,
-						denominator * rhsf.denominator
+					numerator * rhsf.numerator,
+					denominator * rhsf.denominator
 				));
 			}
 			else return ((*this) = INVALID_FRACTION);
@@ -214,19 +229,20 @@ namespace npasson {
 		template<typename T>
 		Fraction& operator/=(const T &rhs) {
             static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator /= (Fraction, [type])");
-			if (typeid(T) == typeid(long long int)
-				|| typeid(T) == typeid(long int)
-				|| typeid(T) == typeid(int)
-				|| typeid(T) == typeid(short))
+			NPASSON_IF_CONSTEXPR (typeid(T) == typeid(long long int)
+			                   || typeid(T) == typeid(long int)
+			                   || typeid(T) == typeid(int)
+			                   || typeid(T) == typeid(short))
 			{
 				return ((*this) = Fraction(numerator, denominator * rhs));
 			}
-			else if (typeid(T) == typeid(float)
-					 || typeid(T) == typeid(double)) {
+			else NPASSON_IF_CONSTEXPR (typeid(T) == typeid(float)
+			                        || typeid(T) == typeid(double))
+			{
 				Fraction rhsf(rhs);
 				return ((*this) = Fraction(
-						numerator * rhsf.denominator,
-						denominator * rhsf.numerator
+					numerator * rhsf.denominator,
+					denominator * rhsf.numerator
 				));
 			}
 			else return ((*this) = INVALID_FRACTION);
@@ -234,19 +250,18 @@ namespace npasson {
 
 		template<typename T>
 		Fraction  operator/(const T &rhs) const {
-            static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator / (Fraction, [type])");
+			static_assert(Fraction::is_supported_type<T>(), "Error: unsupported type for operator / (Fraction, [type])");
 			Fraction temp = (*this);
 			return temp /= rhs;
 		}
 
 		/* *** INCREMENT, DECREMENT, UNARY PLUS/MINUS *** */
-		Fraction& operator ++ ();
-		Fraction  operator ++ (int);
-		Fraction& operator -- ();
-		Fraction  operator -- (int);
-
-		Fraction  operator +  () const;
-		Fraction  operator -  () const;
+		      Fraction& operator ++ ();
+		const Fraction  operator ++ (int);
+		      Fraction& operator -- ();
+		const Fraction  operator -- (int);
+		      Fraction  operator +  ()    const;
+		      Fraction  operator -  ()    const;
 
 		/* *** ASSIGNMENT TO FRACTION *** */
 		
@@ -308,7 +323,7 @@ namespace npasson {
 		Fraction pow(signed int);
 
 		Fraction invert() const;
-		static void invert(Fraction&);
+		NPASSON_MAYBE_UNUSED static void invert(Fraction&);
 
 		friend std::ostream& operator << (std::ostream&, const Fraction&);
 		std::string operator()();
@@ -412,7 +427,6 @@ namespace npasson {
 			printf("| a==b is %s\n", (a==b)?"true":"false");
 			printf("| a!=b is %s\n", (a!=b)?"true":"false");
 			printf("==========================\n");
-
 		}
 #endif
 	};
@@ -507,6 +521,9 @@ namespace npasson {
 		return Fraction(lhs) >= rhs;
 	}
 }
+
+#undef NPASSON_MAYBE_UNUSED
+#undef NPASSON_IF_CONSTEXPR
 
 #ifdef NPASSON_EXPERIMENTAL_COMPILE
 #include "fraction.cpp"
